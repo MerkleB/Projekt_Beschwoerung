@@ -22,8 +22,15 @@ public class GameFrame extends JFrame{
 	}
 	
 	public static void main(String[] args) {
-		GameFrame frame = new GameFrame();
-		frame.setVisible(true);
+		if(args.length > 0) {
+			if(args[0].equals("--ui")) {
+				GameFrame frame = new GameFrame();
+				frame.setVisible(true);
+			}
+		}else {
+			GameConsole console = new GameConsole();
+		}
+			
 	}
 
 }
