@@ -1,6 +1,10 @@
 package server;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+
+import user_interface.GameConsole;
 
 public class ServerConnector implements ServerConnection {
 	
@@ -21,7 +25,25 @@ public class ServerConnector implements ServerConnection {
 	}
 	
 	@Override
-	public boolean connect() {
+	public boolean connect(String userName, String password) {
+		if(sessionID == null) {
+			RequestHandler request = new RequestHandler("Login;"+userName+";"+password, serverIP, port);
+			FutureTask<String> ft = new FutureTask<>(request);
+			Thread thread = new Thread(ft);
+			thread.start();
+			while(!ft.isDone()) {
+			}
+			try {
+				String[] response = ft.get().split(";");
+				if(response[0].equals("SUCCESS")) {
+					sessionID = UUID.fromString(response[1]);
+					return true;
+				}else return false;
+			} catch (InterruptedException | ExecutionException e) {
+				System.out.println("ServerConnector");
+				System.out.println(e.getMessage());
+			}
+		}
 		return false;
 	}
 
