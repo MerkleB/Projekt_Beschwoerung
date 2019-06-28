@@ -28,7 +28,9 @@ public class GameFrame extends JFrame{
 				frame.setVisible(true);
 			}
 		}else {
-			GameConsole console = new GameConsole();
+			GameConsole console = GameConsole.getInstance();
+			Thread worker = new Thread(console);
+			worker.start();
 		}
 			
 	}

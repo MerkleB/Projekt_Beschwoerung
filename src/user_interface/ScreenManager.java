@@ -37,6 +37,7 @@ public class ScreenManager implements ManagesScreens{
 		return instance;
 	}
 	
+	@Override
 	public void gameIsFinished() {
 		panel.gameIsFinished();
 	}
