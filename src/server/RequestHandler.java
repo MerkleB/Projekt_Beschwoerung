@@ -8,9 +8,10 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Hashtable;
 import java.util.concurrent.Callable;
 
-public class RequestHandler implements Callable<String>{
+public class RequestHandler implements Callable<Hashtable<String, String>>{
 	
 	private String ipAdress;
 	private int port;
@@ -23,18 +24,19 @@ public class RequestHandler implements Callable<String>{
 	}
 
 	@Override
-	public String call() throws Exception {
+	public Hashtable<String, String> call() throws Exception {
 		System.out.println("RequestHandler: "+ Thread.currentThread());
 		return RequestServer();
 	}
 	
-	private String RequestServer() throws UnknownHostException, IOException {
-		String response = "";
+	private Hashtable<String, String> RequestServer() throws UnknownHostException, IOException {
+		
 		
 		Socket socket = new Socket(ipAdress, port);
 		
 		sendRequest(request, socket);
-		response = readResponse(socket);
+		String responseText = readResponse(socket);
+		Hashtable<String, String> response = convertResponseStringToHashTable(responseText);
 		socket.close();
 		return response;
 	}
@@ -51,6 +53,24 @@ public class RequestHandler implements Callable<String>{
 			      new BufferedReader(
 			        new InputStreamReader(
 			          socket.getInputStream()));
+		char[] buffer = new char[100];
+		while(!response.contains("$END$")) {
+			int numberOfChars = bufferedReader.read(buffer, 0, 100);
+			response = response + new String(buffer, 0, numberOfChars);
+		}
+		return response;
+	}
+	
+	private Hashtable<String, String> convertResponseStringToHashTable(String responseString) {
+		Hashtable<String, String> response = new Hashtable<String, String>();
+		
+		String[] keyValueList = responseString.split(";");
+		
+		for(int i=0; i<keyValueList.length; i++) {
+			String keyValue[] = keyValueList[i].split("=");
+			response.put(keyValue[0], keyValue[1]);
+		}
+		
 		return response;
 	}
 }

@@ -1,5 +1,6 @@
 package server;
 
+import java.util.Hashtable;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -13,6 +14,7 @@ public class ServerConnector implements ServerConnection {
 	private String serverIP;
 	private int port;
 	private UUID sessionID;
+	private FutureTask<Hashtable<String, String>> futureTask;
 	
 	public static ServerConnection getInstance() {
 		if(instance == null) {
@@ -25,36 +27,47 @@ public class ServerConnector implements ServerConnection {
 	}
 	
 	@Override
-	public boolean connect(String userName, String password) {
+	public boolean connect(String userName, String password) throws InterruptedException, ExecutionException {
 		if(sessionID == null) {
 			RequestHandler request = new RequestHandler("Login;"+userName+";"+password, serverIP, port);
-			FutureTask<String> ft = new FutureTask<>(request);
-			Thread thread = new Thread(ft);
+			futureTask = new FutureTask<>(request);
+			Thread thread = new Thread(futureTask);
 			thread.start();
-			while(!ft.isDone()) {
+			while(!futureTask.isDone()) {
 			}
-			try {
-				String[] response = ft.get().split(";");
-				if(response[0].equals("SUCCESS")) {
-					sessionID = UUID.fromString(response[1]);
+			if(futureTask.isCancelled()) {
+				return false;
+			}else {
+				Hashtable<String, String> response = futureTask.get();
+				if(response.get("Code").equals("100")) {
+					sessionID = UUID.fromString(response.get("Session"));
+					System.out.println("Login was successful");
+					System.out.println("Session "+sessionID+" started!");
+					futureTask = null;
 					return true;
-				}else return false;
-			} catch (InterruptedException | ExecutionException e) {
-				System.out.println("ServerConnector");
-				System.out.println(e.getMessage());
+				}
+				
 			}
+			
 		}
 		return false;
 	}
 
 	@Override
-	public void sendRequest(String command) {
-		
+	public boolean sendRequest(String command) {
+		if(sessionID == null) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
-	public String getResponse() {
-		return null;
+	public Hashtable<String, String> getResponse() throws InterruptedException, ExecutionException {
+		if(sessionID == null || futureTask == null) {
+			return null;
+		}else {
+			return futureTask.get();
+		}
 	}
 
 	@Override

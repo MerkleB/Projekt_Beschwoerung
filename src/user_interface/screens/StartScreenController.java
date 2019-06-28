@@ -3,6 +3,7 @@ package user_interface.screens;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 import server.ServerConnector;
 import user_interface.GameConsole;
@@ -42,11 +43,10 @@ public class StartScreenController implements ControlsScreen{
 			GameConsole.getInstance().writeMessage("Typed:"+user);
 			String password = GameConsole.getInstance().promptUser("Password:");
 			GameConsole.getInstance().writeMessage("Typed:"+password);
-			boolean successful = ServerConnector.getInstance().connect(user, password);
-			if(successful) {
-				GameConsole.getInstance().writeMessage("Connection to server was successful.");
-			}else {
-				GameConsole.getInstance().writeMessage("Connection to server failed.");
+			try {
+				ServerConnector.getInstance().connect(user, password);
+			} catch (InterruptedException|ExecutionException e) {
+				GameConsole.getInstance().writeMessage(e.getMessage());
 			}
 			break;
 	}
