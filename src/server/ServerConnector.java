@@ -71,8 +71,29 @@ public class ServerConnector implements ServerConnection {
 	}
 
 	@Override
-	public boolean disconnect() {
-		// TODO Auto-generated method stub
+	public boolean disconnect() throws InterruptedException, ExecutionException {
+		if(sessionID == null) {
+			RequestHandler request = new RequestHandler("Logout;"+sessionID, serverIP, port);
+			futureTask = new FutureTask<>(request);
+			Thread thread = new Thread(futureTask);
+			thread.start();
+			while(!futureTask.isDone()) {
+			}
+			if(futureTask.isCancelled()) {
+				return false;
+			}else {
+				Hashtable<String, String> response = futureTask.get();
+				if(response.get("Code").equals("100")) {
+					sessionID = UUID.fromString(response.get("Session"));
+					System.out.println("Logout was successful");
+					System.out.println("Session "+sessionID+" ended!");
+					futureTask = null;
+					return true;
+				}
+				
+			}
+			
+		}
 		return false;
 	}
 

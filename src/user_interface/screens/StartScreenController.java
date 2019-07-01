@@ -17,6 +17,7 @@ public class StartScreenController implements ControlsScreen{
 	private ManagesScreens manager;
 	private StartScreen screen;
 	private boolean consolMode;
+	private GameConsole console;
 	
 	/**
 	 * Get new instance of StartScreenController
@@ -28,6 +29,7 @@ public class StartScreenController implements ControlsScreen{
 		this.screen = screen;
 		this.consolMode = consoleMode;
 		if(consoleMode) {
+			console = GameConsole.getInstance();
 			printProgramHeadLine();
 		}
 	}
@@ -36,17 +38,25 @@ public class StartScreenController implements ControlsScreen{
 	public void processAction(Treatable action) {
 		switch(action.getCommand()) {
 		case "Exit": 
+			try {
+				console.writeMessage("Disconnect from Server");
+				if(ServerConnector.getInstance().disconnect() == false) {
+					console.writeMessage("Client was already disconnected.");
+				}
+				
+			} catch (InterruptedException | ExecutionException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			manager.gameIsFinished();
 			break;
 		case "Login":
-			String user = GameConsole.getInstance().promptUser("Username:");
-			GameConsole.getInstance().writeMessage("Typed:"+user);
-			String password = GameConsole.getInstance().promptUser("Password:");
-			GameConsole.getInstance().writeMessage("Typed:"+password);
+			String user = console.promptUser("Username:");
+			String password = console.promptUser("Password:");
 			try {
 				ServerConnector.getInstance().connect(user, password);
 			} catch (InterruptedException|ExecutionException e) {
-				GameConsole.getInstance().writeMessage(e.getMessage());
+				console.writeMessage(e.getMessage());
 			}
 			break;
 	}

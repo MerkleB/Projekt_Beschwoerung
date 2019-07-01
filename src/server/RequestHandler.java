@@ -18,7 +18,7 @@ public class RequestHandler implements Callable<Hashtable<String, String>>{
 	private String request;
 	
 	public RequestHandler(String request, String ip, int port) {
-		this.request = request;
+		this.request = request+";$END$";
 		this.ipAdress = ip;
 		this.port = port;
 	}

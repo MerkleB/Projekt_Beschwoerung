@@ -17,11 +17,12 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
           <archive>
             <manifest>
-              <mainClass>user_interface.GameFrame.java</mainClass>
+              <mainClass>user_interface.GameFrame</mainClass>
             </manifest>
           </archive>
         </configuration>
