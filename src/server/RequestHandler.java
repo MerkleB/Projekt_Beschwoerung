@@ -25,7 +25,7 @@ public class RequestHandler implements Callable<Hashtable<String, String>>{
 
 	@Override
 	public Hashtable<String, String> call() throws Exception {
-		System.out.println("RequestHandler: "+ Thread.currentThread());
+		System.out.println("RequestHandler: Start request handling.");
 		return RequestServer();
 	}
 	
@@ -67,6 +67,9 @@ public class RequestHandler implements Callable<Hashtable<String, String>>{
 		String[] keyValueList = responseString.split(";");
 		
 		for(int i=0; i<keyValueList.length; i++) {
+			if(keyValueList[i].contains("$END$")) {
+				keyValueList[i] = keyValueList[i].replace("$END$", "");
+			}
 			String keyValue[] = keyValueList[i].split("=");
 			response.put(keyValue[0], keyValue[1]);
 		}

@@ -201,7 +201,6 @@ public class StartScreen implements Screen, ButtonListener {
 			}
 			if(!validCommand) {
 				CONSOLE.writeMessage("Start screen: Invalid command!");
-				CONSOLE.writeMessage("Start screen: Invalid command!");
 				printCommands();
 			}
 		}

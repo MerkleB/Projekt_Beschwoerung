@@ -41,15 +41,18 @@ public class ServerConnector implements ServerConnection {
 				Hashtable<String, String> response = futureTask.get();
 				if(response.get("Code").equals("100")) {
 					sessionID = UUID.fromString(response.get("Session"));
-					System.out.println("Login was successful");
-					System.out.println("Session "+sessionID+" started!");
+					GameConsole.getInstance().writeMessage("Login was successful");
+					GameConsole.getInstance().writeMessage("Session "+sessionID+" started!");
 					futureTask = null;
 					return true;
+				}else{
+					GameConsole.getInstance().writeMessage(response.get("Code")+ ":" + response.get("Message"));
 				}
 				
 			}
 			
-		}
+		}else GameConsole.getInstance().writeMessage("ServerConnector: Login refused. You're already logged in.");
+		
 		return false;
 	}
 
@@ -85,10 +88,12 @@ public class ServerConnector implements ServerConnection {
 				Hashtable<String, String> response = futureTask.get();
 				if(response.get("Code").equals("100")) {
 					sessionID = UUID.fromString(response.get("Session"));
-					System.out.println("Logout was successful");
-					System.out.println("Session "+sessionID+" ended!");
+					GameConsole.getInstance().writeMessage("Logout was successful");
+					GameConsole.getInstance().writeMessage("Session "+sessionID+" ended!");
 					futureTask = null;
 					return true;
+				}else {
+					GameConsole.getInstance().writeMessage(response.get("Code")+ ":" + response.get("Message"));
 				}
 				
 			}
