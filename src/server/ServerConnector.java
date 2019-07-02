@@ -72,7 +72,7 @@ public class ServerConnector implements ServerConnection {
 
 	@Override
 	public boolean disconnect() throws InterruptedException, ExecutionException {
-		if(sessionID == null) {
+		if(sessionID != null) {
 			RequestHandler request = new RequestHandler("Logout;"+sessionID, serverIP, port);
 			futureTask = new FutureTask<>(request);
 			Thread thread = new Thread(futureTask);
